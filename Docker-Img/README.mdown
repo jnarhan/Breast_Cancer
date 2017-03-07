@@ -1,0 +1,18 @@
+#Information
+Creates an Ubuntu image with key Python packages installed (Numpy, Scipy, Pandas ..). 
+
+Also includes deep learning packages Theano, Keras and Tensorflow (latest releases).
+
+##Build Image
+From same directory containing the Dockerfile:
+```docker build -t jnarhan/dl-docker .```
+
+##Get Started
+For persistent storage:
+```docker run -it -p 8888:8888 -v /Your Path/To/Docker-Shared/:/root/Docker-Shared jnarhan/dl-docker bash```
+
+Invoke Juypter notebook with
+```jupyter notebook --no-browser --ip=0.0.0.0 --NotebookApp.token=```
+
+##Installation Details
+See file *Image\_Installation\_Details*
