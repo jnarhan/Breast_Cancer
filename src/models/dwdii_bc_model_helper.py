@@ -21,7 +21,7 @@ from scipy import misc
 from scipy import ndimage
 import cv2
 
-def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=False):
+def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=False, exclude = ['unproven', 'pathology']):
     # Load the existing CSV so we can skip what we've already worked on
     bcDict = {}
     bcCounts = collections.defaultdict(int)
@@ -32,9 +32,12 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
             patho = row[5].lower()
             if patho == "":
                 patho = "benign"
-                
-            bcDict[row[0]] = patho
-            bcCounts[patho] += 1
+            
+            if patho in exclude:
+                pass
+            else:              
+                bcDict[row[0]] = patho
+                bcCounts[patho] += 1
 
     if verbose:
         print "Before Balancing"
