@@ -1,7 +1,7 @@
 ﻿$_bashExe = "c:\cygwin\bin\bash.exe"
 $_DdsmRoot = "C:\Code\Python\DATA698-ResearchProj\data\ddsm"
 #$_Output = "C:\Code\Python\DATA698-ResearchProj\data\ddsm\myOutput"
-$_Output = "C:\Users\Dan\Dropbox\DATA698-ResearchProj\data\ddsm\png"
+$_Output = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\pgm"
 $_jpegPath = "/cygdrive/c/code/python/DATA698-ResearchProj/data/ddsm/jpeg.exe"
 $_ddsmraw2pnmPath = "/cygdrive/c/code/python/DATA698-ResearchProj/data/ddsm/ddsmraw2pnm.exe"
 $_pnmtopngPath = "/cygdrive/c/cygwin/bin/pnmtopng.exe"
@@ -119,7 +119,8 @@ function New-DdsmCsvLine
 
 
 # Get the list of LJPEG files to decode
-$files = Get-ChildItem -Path $_DdsmRoot -Filter "*.LJPEG" -Recurse
+#$files = Get-ChildItem -Path $_DdsmRoot -Filter "*.LJPEG" -Recur
+$files = @(Get-Item -Path "C:\Code\Data\DATA698-ResearchProj\ddsm\cancers\cancer_07\case1160\A_1160_1.RIGHT_MLO.LJPEG")
 
 # Load CSV meta data if available.
 $CsvOutput = Join-Path -Path $_Output -ChildPath "Ddsm.csv"
