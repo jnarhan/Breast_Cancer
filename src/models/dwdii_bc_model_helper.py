@@ -55,8 +55,8 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
         for e in bcCounts:
             print e, bcCounts[e]
             
-    #if balanceViaRemoval:
-        #balanaceViaRemoval(bcCounts, bcDict)
+    if balanceViaRemoval:
+        balanaceViaRemoval(bcCounts, bcDict, factor=1.0)
 
     if verbose:
         print
@@ -68,7 +68,7 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
     return bcDict, bcMetaDict
 
 
-def balanaceViaRemoval(emoCounts, emoDict, depth = 0):
+def balanaceViaRemoval(emoCounts, emoDict, depth = 0, factor = 1.50):
 
     if(depth >= 2):
         return
@@ -76,11 +76,16 @@ def balanaceViaRemoval(emoCounts, emoDict, depth = 0):
     # First get mean items per category
     sum = len(emoDict)
     avgE = sum / len(emoCounts)
-
+    theshold = avgE * factor
+    
+    if depth == 0:
+        print "balanaceViaRemoval.avgE: " + str(avgE)
+        print "balanaceViaRemoval.theshold: " + str(theshold)
+        
     # Determine categories for balancing.
     toBeBalanced = []
     for e in emoCounts.keys():
-        if emoCounts[e] > avgE * 1.50:
+        if emoCounts[e] > theshold:
             toBeBalanced.append(e)
 
     # iterate over categories to be balanced and do balancing.
@@ -97,7 +102,7 @@ def balanaceViaRemoval(emoCounts, emoDict, depth = 0):
 
         emoCounts[b] = avgE
 
-    balanaceViaRemoval(emoCounts, emoDict, depth + 1)
+    balanaceViaRemoval(emoCounts, emoDict, depth + 1, factor)
 
 
 def bcNumerics():
