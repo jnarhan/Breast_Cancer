@@ -40,7 +40,7 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
             subfld = row[NDX_SUBFOLDER]
             patho = row[NDX_PATHOLOGY].lower()
             if patho == "":
-                patho = "benign"
+                patho = "normal"
             
             if patho in exclude:
                 pass
@@ -107,8 +107,9 @@ def balanaceViaRemoval(emoCounts, emoDict, depth = 0, factor = 1.50):
 
 def bcNumerics():
     emoNdx = {}
-    emoNdx["benign"] = 0
-    emoNdx["malignant"] = 1
+    emoNdx["normal"] = 0
+    emoNdx["benign"] = 1
+    emoNdx["malignant"] = 2
     return emoNdx
 
 def numericBC():
@@ -204,3 +205,8 @@ def to_categorical(y, nb_classes=None):
     for i in range(len(y)):
         Y[i, y[i]] = 1.
     return Y
+
+
+def splitTrainTestValSets():
+
+    
