@@ -25,6 +25,10 @@ import cv2
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
+NDX_NAME = 0
+NDX_TYPE = 1
+NDX_ABTYPE = 2
+NDX_SCANNER = 3
 NDX_SUBFOLDER = 4
 NDX_PATHOLOGY = 5
 
@@ -206,7 +210,77 @@ def to_categorical(y, nb_classes=None):
         Y[i, y[i]] = 1.
     return Y
 
+def getNameParts(name):
+    parts = name.split(".")
+    sideParts = parts[1].split("_")
 
-def splitTrainTestValSets():
+    case = parts[0]
+    side = sideParts[0]
+    return case, side
 
-    
+def splitTrainTestValSets(metadataFile):
+
+    valSize = 100
+    trainSize = .8
+    testSize = .2
+
+    valCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_val.csv"
+    testCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_test.csv"
+    trainCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_train.csv"
+
+    caseSides = {}
+    with open(metadataFile, 'r') as csvfile:
+        bcCsv = csv.reader(csvfile)
+        headers = bcCsv.next()
+        headers = bcCsv.next()
+        for row in bcCsv:
+            case, side = getNameParts(row[NDX_NAME])
+
+            key = "{0}-{1}".format(case, side)
+
+            # build list of case-sides
+            caseSides[key] = (case, side)
+
+    # Split the keys up
+    csKeys = caseSides.keys()
+    np.random.shuffle(csKeys)
+
+    valKeys = csKeys[0 : valSize]
+    remainingKeys = csKeys[valSize : len(csKeys) - 1]
+
+    trainNdx = int(round(len(remainingKeys) * trainSize))
+    trainKeys = remainingKeys[0 : trainNdx]
+    testKeys = remainingKeys[trainNdx + 1 : len(remainingKeys) - 1]
+
+    # split the actual meta data
+    with open(metadataFile, 'r') as csvfile:
+        with open(valCsv, 'wb') as valfile:
+            with open(testCsv, 'wb') as testfile:
+                with open(trainCsv, 'wb') as trainfile:
+                    bcCsv = csv.reader(csvfile)
+                    valCsv = csv.writer(valfile)
+                    testCsv = csv.writer(testfile)
+                    trainCsv = csv.writer(trainfile)
+
+                    headers = bcCsv.next()
+                    headers = bcCsv.next()
+
+                    valCsv.writerow(headers)
+                    testCsv.writerow(headers)
+                    trainCsv.writerow(headers)
+
+                    for row in bcCsv:
+                        case, side = getNameParts(row[NDX_NAME])
+                        key = "{0}-{1}".format(case, side)
+
+                        if(key in valKeys):
+                            valCsv.writerow(row)
+                        elif (key in testKeys):
+                            testCsv.writerow(row)
+                        elif (key in trainKeys):
+                            trainCsv.writerow(row)
+
+
+    return trainKeys, testKeys, valKeys
+
+   # for k in csKeys:
