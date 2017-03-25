@@ -218,15 +218,17 @@ def getNameParts(name):
     side = sideParts[0]
     return case, side
 
-def splitTrainTestValSets(metadataFile):
+def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv):
+    """Generates 3 CSV files containing the meta data split from the source meta data file.
 
+        :param metadataFile: the path to the source CSV file
+        :param valCsv: The path to the output CSV to be overwritten by the new validation meta data.
+        :param testCsv: The path to the output CSV to be overwritten by the new test meta data.
+        :param trainCsv: The path to the output CSV to be overwritten by the new train meta data.
+    """
     valSize = 100
     trainSize = .8
     testSize = .2
-
-    valCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_val.csv"
-    testCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_test.csv"
-    trainCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_train.csv"
 
     caseSides = {}
     with open(metadataFile, 'r') as csvfile:

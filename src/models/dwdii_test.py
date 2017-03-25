@@ -36,7 +36,12 @@ def main():
 
         bc.to_categorical(Y_data)
     elif action == "split":
-        bc.splitTrainTestValSets(dataFile)
+
+        valCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_val.csv"
+        testCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_test.csv"
+        trainCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_train.csv"
+
+        bc.splitTrainTestValSets(dataFile, valCsv, testCsv, trainCsv)
 
     print "Done"
 
