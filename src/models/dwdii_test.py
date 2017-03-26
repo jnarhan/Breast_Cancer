@@ -13,14 +13,7 @@ import dwdii_bc_model_helper as bc
 def main():
     """Our main function."""
 
-    destPath = "C:\Code\Python\emotional-faces\data\\transformed"
-    srcPath = "C:\Code\Python\emotional-faces\data\Resize"
-
-    #labelFaces()
-
-   #print "OpenCV version: " + cv2.__version__
-
-    #transformFaces(srcPath, destPath)
+    action = "split"
 
     #compareFolders()
     #compareLegendAndFiles()
@@ -30,17 +23,25 @@ def main():
     dataFile = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\png\Ddsm_png.csv"
     imgPath = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\png"
 
-    bc.load_training_metadata(dataFile, True)
+    if(action == "load"):
+        bc.load_training_metadata(dataFile, True)
 
-    X_data, Y_data = bc.load_data(dataFile,
-                                  imgPath,
-                                  maxData = 1000,
-                                  imgResize = (150, 150),
-                                  verboseFreq = 25)
+        X_data, Y_data = bc.load_data(dataFile,
+                                      imgPath,
+                                      maxData = 1000,
+                                      imgResize = (150, 150),
+                                      verboseFreq = 25)
 
-    print X_data.shape
+        print X_data.shape
 
-    bc.to_categorical(Y_data)
+        bc.to_categorical(Y_data)
+    elif action == "split":
+
+        valCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_val.csv"
+        testCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_test.csv"
+        trainCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_train.csv"
+
+        bc.splitTrainTestValSets(dataFile, valCsv, testCsv, trainCsv)
 
     print "Done"
 

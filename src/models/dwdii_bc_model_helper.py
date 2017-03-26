@@ -25,6 +25,10 @@ import cv2
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
+NDX_NAME = 0
+NDX_TYPE = 1
+NDX_ABTYPE = 2
+NDX_SCANNER = 3
 NDX_SUBFOLDER = 4
 NDX_PATHOLOGY = 5
 
@@ -40,7 +44,7 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
             subfld = row[NDX_SUBFOLDER]
             patho = row[NDX_PATHOLOGY].lower()
             if patho == "":
-                patho = "benign"
+                patho = "normal"
             
             if patho in exclude:
                 pass
@@ -107,8 +111,9 @@ def balanaceViaRemoval(emoCounts, emoDict, depth = 0, factor = 1.50):
 
 def bcNumerics():
     emoNdx = {}
-    emoNdx["benign"] = 0
-    emoNdx["malignant"] = 1
+    emoNdx["normal"] = 0
+    emoNdx["benign"] = 1
+    emoNdx["malignant"] = 2
     return emoNdx
 
 def numericBC():
@@ -204,3 +209,80 @@ def to_categorical(y, nb_classes=None):
     for i in range(len(y)):
         Y[i, y[i]] = 1.
     return Y
+
+def getNameParts(name):
+    parts = name.split(".")
+    sideParts = parts[1].split("_")
+
+    case = parts[0]
+    side = sideParts[0]
+    return case, side
+
+def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv):
+    """Generates 3 CSV files containing the meta data split from the source meta data file.
+
+        :param metadataFile: the path to the source CSV file
+        :param valCsv: The path to the output CSV to be overwritten by the new validation meta data.
+        :param testCsv: The path to the output CSV to be overwritten by the new test meta data.
+        :param trainCsv: The path to the output CSV to be overwritten by the new train meta data.
+    """
+    valSize = 100
+    trainSize = .8
+    testSize = .2
+
+    caseSides = {}
+    with open(metadataFile, 'r') as csvfile:
+        bcCsv = csv.reader(csvfile)
+        headers = bcCsv.next()
+        headers = bcCsv.next()
+        for row in bcCsv:
+            case, side = getNameParts(row[NDX_NAME])
+
+            key = "{0}-{1}".format(case, side)
+
+            # build list of case-sides
+            caseSides[key] = (case, side)
+
+    # Split the keys up
+    csKeys = caseSides.keys()
+    np.random.shuffle(csKeys)
+
+    valKeys = csKeys[0 : valSize]
+    remainingKeys = csKeys[valSize : len(csKeys) - 1]
+
+    trainNdx = int(round(len(remainingKeys) * trainSize))
+    trainKeys = remainingKeys[0 : trainNdx]
+    testKeys = remainingKeys[trainNdx + 1 : len(remainingKeys) - 1]
+
+    # split the actual meta data
+    with open(metadataFile, 'r') as csvfile:
+        with open(valCsv, 'wb') as valfile:
+            with open(testCsv, 'wb') as testfile:
+                with open(trainCsv, 'wb') as trainfile:
+                    bcCsv = csv.reader(csvfile)
+                    valCsv = csv.writer(valfile)
+                    testCsv = csv.writer(testfile)
+                    trainCsv = csv.writer(trainfile)
+
+                    headers = bcCsv.next()
+                    headers = bcCsv.next()
+
+                    valCsv.writerow(headers)
+                    testCsv.writerow(headers)
+                    trainCsv.writerow(headers)
+
+                    for row in bcCsv:
+                        case, side = getNameParts(row[NDX_NAME])
+                        key = "{0}-{1}".format(case, side)
+
+                        if(key in valKeys):
+                            valCsv.writerow(row)
+                        elif (key in testKeys):
+                            testCsv.writerow(row)
+                        elif (key in trainKeys):
+                            trainCsv.writerow(row)
+
+
+    return trainKeys, testKeys, valKeys
+
+   # for k in csKeys:
