@@ -33,6 +33,20 @@ NDX_SUBFOLDER = 4
 NDX_PATHOLOGY = 5
 
 def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=False, exclude = ['unproven', 'pathology', 'benign_without_callback']):
+    """ Loads the designated meta data optionally balancing the data by removing heavily weighted category entries.
+
+    2 result sets are returned:
+        1) Dictionary where key = filename and value = label (normal, benign, malignant)
+        2) Dictionary where key = filename and value = list with values sub folder)= (0,1,2,3,4)
+        3) Dictionary where key = label (normal, benign, etc) and value = count of images in category.
+
+    :param metadataFile:
+    :param balanceViaRemoval:
+    :param verbose:
+    :param exclude:
+    :return:
+    """
+
     # Load the existing CSV so we can skip what we've already worked on
     bcDict = {}
     bcMetaDict = {}
@@ -54,22 +68,22 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
                 bcCounts[patho] += 1
 
     if verbose:
-        print "Before Balancing"
+        print "Raw Balance"
         print "----------------"
         for e in bcCounts:
             print e, bcCounts[e]
             
     if balanceViaRemoval:
         balanaceViaRemoval(bcCounts, bcDict, factor=1.0)
+        if verbose:
+            print
+            print "After Balancing"
+            print "----------------"
+            for e in bcCounts:
+                print e, bcCounts[e]
 
-    if verbose:
-        print
-        print "After Balancing"
-        print "----------------"
-        for e in bcCounts:
-            print e, bcCounts[e]
         
-    return bcDict, bcMetaDict
+    return bcDict, bcMetaDict, bcCounts
 
 
 def balanaceViaRemoval(emoCounts, emoDict, depth = 0, factor = 1.50):
@@ -130,7 +144,7 @@ def load_data(metadataFile, imagesPath, categories = bcNumerics(), verbose=True,
     show = False
 
     # Load the CSV meta data
-    emoMetaData, bcDetaDict = load_training_metadata(metadataFile, True, verbose=verbose)
+    emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose)
     total = len(emoMetaData)
     ndx = 0.0
 
@@ -218,17 +232,19 @@ def getNameParts(name):
     side = sideParts[0]
     return case, side
 
-def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv):
-    """Generates 3 CSV files containing the meta data split from the source meta data file.
+def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv, valSize = 100, trainPct = 0.80, seed = 20275):
+    """Generates 3 CSV files containing the meta data split from the source meta data file. First a Numpy
+    random shuffle is performed on the data loaded from the metadataFile.
 
         :param metadataFile: the path to the source CSV file
         :param valCsv: The path to the output CSV to be overwritten by the new validation meta data.
         :param testCsv: The path to the output CSV to be overwritten by the new test meta data.
         :param trainCsv: The path to the output CSV to be overwritten by the new train meta data.
+        :param valSize: The number of data rows to pull out for validation purposes
+        :param trainPct: Of the remaining data rows after the validation rows have been removed, the percent of
+                         data to seperate for training purposes. After the training data is extracted, the final
+                         remaining data is saved to the test data set.
     """
-    valSize = 100
-    trainSize = .8
-    testSize = .2
 
     caseSides = {}
     with open(metadataFile, 'r') as csvfile:
@@ -245,12 +261,15 @@ def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv):
 
     # Split the keys up
     csKeys = caseSides.keys()
+
+    # Shuffle
+    np.random.seed(seed)
     np.random.shuffle(csKeys)
 
     valKeys = csKeys[0 : valSize]
-    remainingKeys = csKeys[valSize : len(csKeys) - 1]
+    remainingKeys = csKeys[valSize + 1 : len(csKeys) - 1]
 
-    trainNdx = int(round(len(remainingKeys) * trainSize))
+    trainNdx = int(round(len(remainingKeys) * trainPct))
     trainKeys = remainingKeys[0 : trainNdx]
     testKeys = remainingKeys[trainNdx + 1 : len(remainingKeys) - 1]
 

@@ -8,7 +8,33 @@
 __author__ = 'Daniel Dittenhafer'
 
 import dwdii_bc_model_helper as bc
+import os
+import numpy as np
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
 
+def barChart(data, filename="barchart.png", title='Bar Chart', xLabelRotation=10, colors=('b','r','g')):
+
+    theKeys = []
+    theValues = []
+    for key, value in sorted(data.items()):
+        theKeys.append(key)
+        theValues.append(value)
+
+    width = 0.35  # the width of the bars
+    ind = np.arange(len(data))
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(ind, theValues, width, color=colors)
+
+    # add some text for labels, title and axes ticks
+    ax.set_ylabel('Count')
+    ax.set_title(title)
+    ax.set_xticks(ind + width / 2)
+    ax.set_xticklabels(theKeys, rotation=xLabelRotation)
+
+    # ax.legend((rects1[0]), ('MIAS'))
+    plt.show()
+    fig.savefig(filename, dpi=fig.dpi)
 
 def main():
     """Our main function."""
@@ -37,11 +63,21 @@ def main():
         bc.to_categorical(Y_data)
     elif action == "split":
 
-        valCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_val.csv"
-        testCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_test.csv"
-        trainCsv = "C:\Code\Python\DATA698-ResearchProj\data\\ddsm_train.csv"
+        outDir = "C:\Code\Other\Breast_Cancer\data"
+        valCsv = os.path.join(outDir, "ddsm_val.csv")
+        testCsv = os.path.join(outDir, "ddsm_test.csv")
+        trainCsv = os.path.join(outDir, "ddsm_train.csv")
 
         bc.splitTrainTestValSets(dataFile, valCsv, testCsv, trainCsv)
+
+        a, b, valData = bc.load_training_metadata(valCsv)
+        barChart(valData, filename="../../figures/ddsm_val_dist.png", title="DDSN Validation Set Distribution")
+
+        a, b, testData = bc.load_training_metadata(testCsv)
+        barChart(testData, filename="../../figures/ddsm_test_dist.png", title="DDSN Test Set Distribution")
+
+        a, b, trainData = bc.load_training_metadata(trainCsv)
+        barChart(trainData, filename="../../figures/ddsm_train_dist.png", title="DDSN Training Set Distribution")
 
     print "Done"
 
