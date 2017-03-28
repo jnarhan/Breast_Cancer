@@ -23,6 +23,7 @@ RUN conda install -y \
     matplotlib \
     pillow \
     opencv \
+    scikit-learn \
   && conda clean --yes --tarballs --packages --source-cache \
   && pip install --upgrade -I setuptools \
   && pip install --upgrade \
