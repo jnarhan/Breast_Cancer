@@ -16,3 +16,13 @@ Invoke Juypter notebook with
 
 ##Installation Details
 See file *Image\_Installation\_Details*
+
+##Known Issues
+Using TensorFlow as backend with latest Keras (2.0.2) causes following error: cannot import name ctc_ops
+Change the Keras Backend to use Theano as the default: In the file $HOME./keras/keras.json:
+{
+    "epsilon": 1e-07, 
+    "floatx": "float32", 
+    "image_data_format": "channels_last", 
+    "backend": "theano"
+}
