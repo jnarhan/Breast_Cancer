@@ -305,3 +305,21 @@ def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv, valSize = 100
     return trainKeys, testKeys, valKeys
 
    # for k in csKeys:
+
+def load_mias_labeldata(metadataFile, skip_lines=102):
+
+    ld = {}
+    with open(metadataFile, 'r') as csvfile:
+
+        emoCsv = csv.reader(csvfile, delimiter=' ')
+        # skip first 104 lines of description info
+        for i in range(0, skip_lines):
+            emoCsv.next()
+
+        for row in emoCsv:
+            if len(row) >= 2:
+                ld[row[0]] = [row[2]]
+                if row[2] != "NORM":
+                    ld[row[0]].append(row[3])
+
+    return ld
