@@ -13,6 +13,7 @@ import os
 import random
 import sys
 import gc
+from decimal import *
 
 from scipy import misc
 
@@ -145,15 +146,15 @@ def load_data(metadataFile, imagesPath, categories = bcNumerics(), verbose=True,
 
     # Load the CSV meta data
     emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose)
-    total = len(emoMetaData)
-    ndx = 0.0
+    total = Decimal(len(emoMetaData))
+    ndx = 0
 
     x, y = imgSize
     if imgResize is not None:
         x, y = imgResize
         
     if maxData is not None:
-        total = maxData
+        total = Decimal(maxData)
 
     # Allocate containers for the data
     X_data = np.zeros([total, x, y])

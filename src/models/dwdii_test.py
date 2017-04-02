@@ -68,10 +68,10 @@ def mias_convert_metadata(mias, destPath):
             if len(mias[k]) > 1:
                 if mias[k][1] == "M":
                     row.append("MALIGNANT")
-                elif mias[k][1] == "B":
-                    row.append("BENIGN")
                 else:
-                    row.append("")
+                    row.append("BENIGN")
+            else:
+                row.append("")
 
             # Lesion Type
             if mias[k][0] == "CALC":
