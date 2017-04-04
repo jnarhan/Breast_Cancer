@@ -88,7 +88,7 @@ def mias_convert_metadata(mias, destPath):
 def main():
     """Our main function."""
 
-    action = "mias-labels"
+    action = "splitDist"
 
     #compareFolders()
     #compareLegendAndFiles()
@@ -97,6 +97,10 @@ def main():
     #imgPath = "C:\Code\Data\DATA698-ResearchProj\ddsm-sm"
     dataFile = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\png\Ddsm_png.csv"
     imgPath = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\png"
+    outDir = "C:\Code\Other\Breast_Cancer\data"
+    valCsv = os.path.join(outDir, "ddsm_val.csv")
+    testCsv = os.path.join(outDir, "ddsm_test.csv")
+    trainCsv = os.path.join(outDir, "ddsm_train.csv")
 
     if(action == "load"):
         bc.load_training_metadata(dataFile, True)
@@ -112,13 +116,9 @@ def main():
         bc.to_categorical(Y_data)
     elif action == "split":
 
-        outDir = "C:\Code\Other\Breast_Cancer\data"
-        valCsv = os.path.join(outDir, "ddsm_val.csv")
-        testCsv = os.path.join(outDir, "ddsm_test.csv")
-        trainCsv = os.path.join(outDir, "ddsm_train.csv")
-
         bc.splitTrainTestValSets(dataFile, valCsv, testCsv, trainCsv)
 
+    elif action == "splitDist":
         a, b, valData = bc.load_training_metadata(valCsv)
         barChart(valData, filename="../../figures/ddsm_val_dist.png", title="DDSN Validation Set Distribution")
 
