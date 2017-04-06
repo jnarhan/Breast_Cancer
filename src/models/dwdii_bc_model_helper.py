@@ -361,3 +361,29 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+
+def cleanDataSet(csvFile, imageRoot):
+
+    data = []
+    with open(csvFile, 'r') as csvfile:
+        bcCsv = csv.reader(csvfile)
+        headers = bcCsv.next()
+        for row in bcCsv:
+
+            name = row[NDX_NAME]
+            subfld = row[NDX_SUBFOLDER]
+
+            fullName = os.path.join(imageRoot, subfld, name)
+            if os.path.exists(fullName):
+                data.append(row)
+            else:
+                print "Not found: " + fullName
+
+    with open(csvFile + "2.csv", 'wb') as file:
+        dataCsv = csv.writer(file)
+        dataCsv.writerow(headers)
+        for row in data:
+            dataCsv.writerow(row)
+
+
+

@@ -88,7 +88,7 @@ def mias_convert_metadata(mias, destPath):
 def main():
     """Our main function."""
 
-    action = "splitDist"
+    action = "cleanDataSets"
 
     #compareFolders()
     #compareLegendAndFiles()
@@ -117,6 +117,12 @@ def main():
     elif action == "split":
 
         bc.splitTrainTestValSets(dataFile, valCsv, testCsv, trainCsv)
+
+    elif action == "cleanDataSets":
+
+        bc.cleanDataSet(valCsv, imgPath)
+        bc.cleanDataSet(testCsv, imgPath)
+        bc.cleanDataSet(trainCsv, imgPath)
 
     elif action == "splitDist":
         a, b, valData = bc.load_training_metadata(valCsv)
