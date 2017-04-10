@@ -13,6 +13,8 @@ import os
 import random
 import sys
 import gc
+import itertools
+from decimal import *
 
 from scipy import misc
 
@@ -145,15 +147,15 @@ def load_data(metadataFile, imagesPath, categories = bcNumerics(), verbose=True,
 
     # Load the CSV meta data
     emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose)
-    total = len(emoMetaData)
-    ndx = 0.0
+    total = Decimal(len(emoMetaData))
+    ndx = 0
 
     x, y = imgSize
     if imgResize is not None:
         x, y = imgResize
         
     if maxData is not None:
-        total = maxData
+        total = Decimal(maxData)
 
     # Allocate containers for the data
     X_data = np.zeros([total, x, y])
@@ -171,13 +173,14 @@ def load_data(metadataFile, imagesPath, categories = bcNumerics(), verbose=True,
                 img = misc.imread(filepath, flatten = True) # flatten = True?
             else:
                 img = None
+                print "Not Found: " + filepath
 
-            # Only accept images that are the appropriate size
-            if img is not None: #and img.shape == imgSize:
+            # Only accept images that were loaded
+            if img is not None: 
 
                 # Verbose status
                 if verbose and ndx % verboseFreq == 0:
-                    msg = "{0:f}: {1}\r\n".format(ndx / total, k)
+                    msg = "{0:.4f}: {1}\r\n".format(ndx / total, k)
                     sys.stdout.writelines(msg)
                 
                 # Resize if desired.
@@ -305,3 +308,82 @@ def splitTrainTestValSets(metadataFile, valCsv, testCsv, trainCsv, valSize = 100
     return trainKeys, testKeys, valKeys
 
    # for k in csKeys:
+
+def load_mias_labeldata(metadataFile, skip_lines=102):
+
+    ld = {}
+    with open(metadataFile, 'r') as csvfile:
+
+        emoCsv = csv.reader(csvfile, delimiter=' ')
+        # skip first 104 lines of description info
+        for i in range(0, skip_lines):
+            emoCsv.next()
+
+        for row in emoCsv:
+            if len(row) >= 2:
+                ld[row[0]] = [row[2]]
+                if row[2] != "NORM":
+                    ld[row[0]].append(row[3])
+
+    return ld
+
+
+# From: http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, '{0:.4f}'.format(cm[i, j]),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+def cleanDataSet(csvFile, imageRoot):
+
+    data = []
+    with open(csvFile, 'r') as csvfile:
+        bcCsv = csv.reader(csvfile)
+        headers = bcCsv.next()
+        for row in bcCsv:
+
+            name = row[NDX_NAME]
+            subfld = row[NDX_SUBFOLDER]
+
+            fullName = os.path.join(imageRoot, subfld, name)
+            if os.path.exists(fullName):
+                data.append(row)
+            else:
+                print "Not found: " + fullName
+
+    with open(csvFile + "2.csv", 'wb') as file:
+        dataCsv = csv.writer(file)
+        dataCsv.writerow(headers)
+        for row in data:
+            dataCsv.writerow(row)
+
+
+
