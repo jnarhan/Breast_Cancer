@@ -16,6 +16,8 @@ from keras.models import Sequential
 from keras.layers import Dropout, Flatten, Dense
 from keras import applications
 from skimage import color
+import cv2
+from matplotlib import pyplot as plt
 
 # Loading the Model Helper function for my system
 os.chdir('E:\erikn\Documents\DATA698\code')
@@ -34,6 +36,12 @@ X_data, Y_data = bc.load_data(trainDataPath, imagePath, maxData = lenTrain, verb
 print(X_data.shape)
 print(Y_data.shape)
 
+# t_image = X_data[0] * 255
+# t_image = 255 - t_image
+# t_image = color.gray2rgb(t_image)
+# t_image.shape
+# plt.imshow(t_image)
+
 lenTest = 195
 X_test, Y_test = bc.load_data(testDataPath, imagePath, maxData = lenTrain, verboseFreq = 50, imgResize=imgResize)
 print(X_test.shape)
@@ -48,11 +56,11 @@ def VGG_Prep(img_data):
     """
     images = np.zeros([len(img_data), img_data.shape[1], img_data.shape[2], 3])
     for i in range(0, len(img_data)):
-        im = img_data[i]
+        im = 255 - (img_data[i] * 255) # Orginal imagnet images were not rescaled
         im = color.gray2rgb(im)
-        im *= 255 # Orginal imagnet images were not rescaled
         images[i] = im
     return(images)
+
 
 # Running the test and train data through VGG16 preperation function
 X_data = VGG_Prep(X_data)
@@ -60,8 +68,12 @@ X_test = VGG_Prep(X_test)
 print(X_data.shape)
 print(X_test.shape)
 
+print(X_data[0].shape)
+
+plt.imshow(X_data[0])
+
 # Creating the VGG16 model
-model = applications.VGG16(include_top=False, weights='imagenet', input_shape=(X_data.shape[1], X_data.shape[2], 3))
+model = applications.VGG16(include_top=False, weights='imagenet')
 
 # Generating the bottleneck features for the training data
 bottleneck_features_train = model.predict(X_data)

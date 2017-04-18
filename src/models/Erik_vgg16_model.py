@@ -59,7 +59,7 @@ def train_top_model():
     model.add(Dropout(0.5))
     model.add(Dense(3))
     model.add(Activation('softmax'))
-
+    # try Adadelta and Adam
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy', 
                   metrics=['accuracy'])
