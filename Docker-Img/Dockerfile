@@ -22,6 +22,7 @@ RUN conda install -y \
     jupyter \
     matplotlib \
     pillow \
+    tqdm \
     opencv \
     scikit-learn \
   && conda clean --yes --tarballs --packages --source-cache \
