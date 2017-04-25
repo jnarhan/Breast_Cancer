@@ -28,7 +28,7 @@ test_labels = 'E:/erikn/Documents/DATA698/model/labels_test.npy'
 top_model_weights_path = 'E:/erikn/Documents/DATA698/model/top_weights01.h5'
 
 # Setting Variables for the experiment
-epoch = 50
+epoch = 100
 batch = 48
 
 class LossHistory(cb.Callback):
