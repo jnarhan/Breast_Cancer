@@ -151,13 +151,22 @@ def numericBC():
 
     return ndxEmo
 
-def load_data(metadataFile, imagesPath, categories = bcNumerics(), verbose=True, verboseFreq = 200, maxData = None, imgSize = (350, 350), imgResize = None, theseEmotions = None):
+def load_data(metadataFile,
+              imagesPath,
+              categories = bcNumerics(),
+              verbose=True,
+              verboseFreq = 200,
+              maxData = None,
+              imgSize = (350, 350),
+              imgResize = None,
+              theseEmotions = None,
+              normalVsAbnormal = False):
     """Helper function to load the training/test data"""
 
     show = False
 
     # Load the CSV meta data
-    emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose)
+    emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose, normalVsAbnormal=normalVsAbnormal)
     total = Decimal(len(emoMetaData))
     ndx = 0
 
