@@ -151,6 +151,19 @@ def numericBC():
 
     return ndxEmo
 
+def bcNormVsAbnormNumerics():
+    emoNdx = {}
+    emoNdx["normal"] = 0
+    emoNdx["abnormal"] = 1
+    return emoNdx
+
+def reverseDict(d):
+    ndxEmo = {}
+    for k in d:
+        ndxEmo[d[k]] = k
+
+    return ndxEmo
+
 def load_data(metadataFile,
               imagesPath,
               categories = bcNumerics(),
