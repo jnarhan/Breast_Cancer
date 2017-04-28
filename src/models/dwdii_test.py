@@ -88,7 +88,7 @@ def mias_convert_metadata(mias, destPath):
 def main():
     """Our main function."""
 
-    action = "load"
+    action = "splitDist"
 
     #compareFolders()
     #compareLegendAndFiles()
