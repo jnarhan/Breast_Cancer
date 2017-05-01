@@ -88,7 +88,7 @@ def mias_convert_metadata(mias, destPath):
 def main():
     """Our main function."""
 
-    action = "cleanDataSets"
+    action = "splitDist"
 
     #compareFolders()
     #compareLegendAndFiles()
@@ -103,7 +103,7 @@ def main():
     trainCsv = os.path.join(outDir, "ddsm_train.csv")
 
     if(action == "load"):
-        bc.load_training_metadata(dataFile, True)
+        bc.load_training_metadata(dataFile, True, verbose=True, normalVsAbnormal=True)
 
         X_data, Y_data = bc.load_data(dataFile,
                                       imgPath,

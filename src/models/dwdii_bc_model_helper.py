@@ -17,6 +17,7 @@ import itertools
 from decimal import *
 
 from scipy import misc
+from scipy import ndimage
 
 import numpy as np
 
@@ -34,10 +35,14 @@ NDX_SCANNER = 3
 NDX_SUBFOLDER = 4
 NDX_PATHOLOGY = 5
 
-def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=False, exclude = ['unproven', 'pathology', 'benign_without_callback']):
+def load_training_metadata(metadataFile,
+                           balanceViaRemoval = False,
+                           verbose=False,
+                           exclude = ['unproven', 'pathology', 'benign_without_callback'],
+                           normalVsAbnormal=False):
     """ Loads the designated meta data optionally balancing the data by removing heavily weighted category entries.
 
-    2 result sets are returned:
+    3 result sets are returned:
         1) Dictionary where key = filename and value = label (normal, benign, malignant)
         2) Dictionary where key = filename and value = list with values sub folder)= (0,1,2,3,4)
         3) Dictionary where key = label (normal, benign, etc) and value = count of images in category.
@@ -50,6 +55,7 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
     """
 
     # Load the existing CSV so we can skip what we've already worked on
+    abnormalList = ["benign", "malignant"]
     bcDict = {}
     bcMetaDict = {}
     bcCounts = collections.defaultdict(int)
@@ -61,10 +67,16 @@ def load_training_metadata(metadataFile, balanceViaRemoval = False, verbose=Fals
             patho = row[NDX_PATHOLOGY].lower()
             if patho == "":
                 patho = "normal"
-            
+
+
             if patho in exclude:
                 pass
-            else:              
+            else:
+
+                if normalVsAbnormal and (patho in abnormalList):
+                    patho = "abnormal"
+
+                # Load into our result sets
                 bcDict[row[0]] = patho
                 bcMetaDict[row[0]] = (subfld)
                 bcCounts[patho] += 1
@@ -140,13 +152,35 @@ def numericBC():
 
     return ndxEmo
 
-def load_data(metadataFile, imagesPath, categories = bcNumerics(), verbose=True, verboseFreq = 200, maxData = None, imgSize = (350, 350), imgResize = None, theseEmotions = None):
+def bcNormVsAbnormNumerics():
+    emoNdx = {}
+    emoNdx["normal"] = 0
+    emoNdx["abnormal"] = 1
+    return emoNdx
+
+def reverseDict(d):
+    ndxEmo = {}
+    for k in d:
+        ndxEmo[d[k]] = k
+
+    return ndxEmo
+
+def load_data(metadataFile,
+              imagesPath,
+              categories = bcNumerics(),
+              verbose=True,
+              verboseFreq = 200,
+              maxData = None,
+              imgSize = (350, 350),
+              imgResize = None,
+              theseEmotions = None,
+              normalVsAbnormal = False):
     """Helper function to load the training/test data"""
 
     show = False
 
     # Load the CSV meta data
-    emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose)
+    emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose, normalVsAbnormal=normalVsAbnormal)
     total = Decimal(len(emoMetaData))
     ndx = 0
 
@@ -385,5 +419,11 @@ def cleanDataSet(csvFile, imageRoot):
         for row in data:
             dataCsv.writerow(row)
 
+def reflectY(img):
 
+    tx = [[1, 0], [0, -1]]
+    offset = [0, img.shape[0]]
+    img2 = ndimage.interpolation.affine_transform(img, tx, offset)
+
+    return img2
 
