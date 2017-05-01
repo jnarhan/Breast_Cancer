@@ -17,6 +17,7 @@ import itertools
 from decimal import *
 
 from scipy import misc
+from scipy import ndimage
 
 import numpy as np
 
@@ -418,5 +419,11 @@ def cleanDataSet(csvFile, imageRoot):
         for row in data:
             dataCsv.writerow(row)
 
+def reflectY(img):
 
+    tx = [[1, 0], [0, -1]]
+    offset = [0, img.shape[0]]
+    img2 = ndimage.interpolation.affine_transform(img, tx, offset)
+
+    return img2
 
