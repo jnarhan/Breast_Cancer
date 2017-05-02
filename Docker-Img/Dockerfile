@@ -16,6 +16,8 @@ RUN curl -qsSLkO \
 ENV PATH=/root/miniconda2/bin:$PATH
 
 RUN conda install -y \
+    scipy \
+    numpy \
     h5py \
     pandas \
     theano \
@@ -25,6 +27,7 @@ RUN conda install -y \
     tqdm \
     opencv \
     scikit-learn \
+    scikit-image \
   && conda clean --yes --tarballs --packages --source-cache \
   && pip install --upgrade -I setuptools \
   && pip install --upgrade \
