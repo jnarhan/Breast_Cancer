@@ -129,3 +129,18 @@ def run_network(data, model, epochs=20, batch=256, verbosity=2):
     except KeyboardInterrupt:
         print ' KeyboardInterrupt'
         return model, history.losses
+    
+def imageDataGenTransform(img, y):
+    # Using keras ImageDataGenerator to generate random images
+    datagen = ImageDataGenerator(
+        zoom_range = 0.1,
+        horizontal_flip = True)
+        
+    #x = img_to_array(img)
+    x = img.reshape(1, 1, img.shape[0], img.shape[1])
+    j = 0
+    for imgT, yT in datagen.flow(x, y, batch_size = 1, save_to_dir = None):
+        img2 = imgT
+        break
+
+    return img2    

@@ -173,7 +173,7 @@ def load_data(metadataFile,
               maxData = None,
               imgSize = (350, 350),
               imgResize = None,
-              theseEmotions = None,
+              thesePathos = None,
               normalVsAbnormal = False):
     """Helper function to load the training/test data"""
 
@@ -181,7 +181,7 @@ def load_data(metadataFile,
 
     # Load the CSV meta data
     emoMetaData, bcDetaDict, bcCounts = load_training_metadata(metadataFile, True, verbose=verbose, normalVsAbnormal=normalVsAbnormal)
-    total = Decimal(len(emoMetaData))
+    total = len(emoMetaData)
     ndx = 0
 
     x, y = imgSize
@@ -189,7 +189,7 @@ def load_data(metadataFile,
         x, y = imgResize
         
     if maxData is not None:
-        total = Decimal(maxData)
+        total = maxData
 
     # Allocate containers for the data
     X_data = np.zeros([total, x, y])
@@ -198,7 +198,7 @@ def load_data(metadataFile,
     # load the image bits based on what's in the meta data
     for k in emoMetaData.keys():
         
-        if theseEmotions is None or emoMetaData[k] in theseEmotions:
+        if thesePathos is None or emoMetaData[k] in thesePathos:
 
             # Load the file
             filepath = os.path.join(imagesPath, bcDetaDict[k][0], k)
@@ -214,7 +214,7 @@ def load_data(metadataFile,
 
                 # Verbose status
                 if verbose and ndx % verboseFreq == 0:
-                    msg = "{0:.4f}: {1}\r\n".format(ndx / total, k)
+                    msg = "{0:.4f}: {1}\r\n".format(ndx / Decimal(total), k)
                     sys.stdout.writelines(msg)
                 
                 # Resize if desired.
