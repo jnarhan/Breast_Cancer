@@ -88,15 +88,106 @@ def bc_model_v01(outputClasses, input_shape=(3, 150, 150), verbose=False):
 
     return model
 
+def bc_model_v02(outputClasses, input_shape=(3, 150, 150), verbose=False):
+    model = Sequential()
+    model.add(Convolution2D(32, 8, 8, input_shape=input_shape))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add( Dropout(0.4)) # Added dropout
+
+    model.add(Convolution2D(32, 5, 5))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Convolution2D(64, 3, 3))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Convolution2D(64, 2, 2))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Flatten())
+    model.add(Dense(64))
+    model.add(Activation('relu'))
+    # model.add(Dropout(0.4))
+    model.add(Dense(outputClasses))
+    model.add(Activation('softmax'))
+
+    if verbose:
+        print (model.summary())
+        
+    if outputClasses > 2:
+        loss = 'categorical_crossentropy'
+    else:
+        loss = 'binary_crossentropy'
+        
+    print loss   
+    model.compile(loss=loss,
+                  optimizer='rmsprop',
+                  metrics=['accuracy'])
+
+    return model
+
+def bc_model_v03(outputClasses, input_shape=(3, 150, 150), verbose=False):
+    model = Sequential()
+    model.add(Convolution2D(32, 8, 8, input_shape=input_shape))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add( Dropout(0.4)) # Added dropout
+
+    model.add(Convolution2D(32, 5, 5))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add( Dropout(0.4)) # Added dropout
+
+    model.add(Convolution2D(64, 3, 3))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Convolution2D(64, 2, 2))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Flatten())
+    model.add(Dense(64))
+    model.add(Activation('relu'))
+    # model.add(Dropout(0.4))
+    model.add(Dense(outputClasses))
+    model.add(Activation('softmax'))
+
+    if verbose:
+        print (model.summary())
+        
+    if outputClasses > 2:
+        loss = 'categorical_crossentropy'
+    else:
+        loss = 'binary_crossentropy'
+        
+    print loss   
+    model.compile(loss=loss,
+                  optimizer='rmsprop',
+                  metrics=['accuracy'])
+
+    return model
+
+
+# From Jay Narhan
 class LossHistory(cb.Callback):
     def on_train_begin(self, logs={}):
         self.losses = []
+        self.acc = []
 
-    def on_batch_end(self, batch, logs={}):
-        batch_loss = logs.get('loss')
-        self.losses.append(batch_loss)
+    def on_epoch_end(self, batch, logs={}):
+        epoch_tr_loss  = logs.get('loss')
+        epoch_val_loss = logs.get('val_loss')
+        self.losses.append([epoch_tr_loss, epoch_val_loss])
+        
+        epoch_tr_acc  = logs.get('acc')
+        epoch_val_acc = logs.get('val_acc')
+        self.acc.append([epoch_tr_acc, epoch_val_acc])
 
-def run_network(data, model, epochs=20, batch=256, verbosity=2):
+def run_network(data, model, epochs=20, batch=256, verbosity=2, earlyStop=False):
     """
 
     :param data: X_train, X_test, y_train, y_test
@@ -107,28 +198,54 @@ def run_network(data, model, epochs=20, batch=256, verbosity=2):
     """
     try:
         start_time = time.time()
+        cbs = []
 
         history = LossHistory()
+        cbs.append(history)
         X_train, X_test, y_train, y_test = data
 
         y_trainC = np_utils.to_categorical(y_train )
         y_testC = np_utils.to_categorical(y_test)
         print y_trainC.shape
         print y_testC.shape
+        
+        if earlyStop:
+            earlyStopping = cb.EarlyStopping(monitor='val_loss', min_delta=0, patience=1, verbose=2, mode='auto')
+            cbs.append(earlyStopping)
 
         print 'Training model...'
         model.fit(X_train, y_trainC, nb_epoch=epochs, batch_size=batch,
-                  callbacks=[history],
+                  callbacks=cbs,
                   validation_data=(X_test, y_testC), verbose=verbosity)
 
         print "Training duration : {0}".format(time.time() - start_time)
         score = model.evaluate(X_test, y_testC, batch_size=16, verbose=0)
 
         print "Network's test score [loss, accuracy]: {0}".format(score)
-        return model, history.losses
+        print 'CNN Error: {:.2f}%'.format(100 - score[1] * 100)
+        
+        return model, history.losses, history.acc
     except KeyboardInterrupt:
         print ' KeyboardInterrupt'
-        return model, history.losses
+        return model, history.losses, history.acc
+    
+# From Jay Narhan
+def plot_losses(losses, acc):
+    fig = plt.figure()
+    ax = fig.add_subplot(221)
+    ax.plot(losses)
+    ax.set_title('Model Loss')
+    ax.set_ylabel('loss')
+    ax.set_xlabel('epoch')
+    ax.legend(['train', 'test'], loc='upper left')
+    
+    ax = fig.add_subplot(222)
+    ax.plot(acc)
+    ax.set_title('Model Accuracy')
+    ax.set_ylabel('accuracy')
+    ax.set_xlabel('epoch')
+    ax.legend(['train', 'test'], loc='upper left')
+    plt.show()    
     
 def imageDataGenTransform(img, y):
     # Using keras ImageDataGenerator to generate random images
