@@ -102,6 +102,23 @@ def bcNumerics():
     bcNdx["abnormal"] = 1
     return bcNdx
 
+
+def bcNumericsPaths():
+    bcNdx = {}
+    bcNdx["normal"] = 0
+    bcNdx["benign"] = 1
+    bcNdx["malignant"] = 2
+
+    return bcNdx
+
+
+def bcNumerics2ClassLesions():
+    bcNdx = {}
+    bcNdx["benign"] = 0
+    bcNdx["malignant"] = 1
+
+    return bcNdx
+
 # From Daniel Dittenhafer for use in Confusion Matrix
 def reverseDict(d):
     ndxEmo = {}
@@ -243,7 +260,6 @@ def plot_losses(losses, acc):
     ax.set_ylabel('accuracy')
     ax.set_xlabel('epoch')
     ax.legend(['train', 'test'], loc='upper left')
-    plt.show()
 
 
 def save_model(dir_path, model, name):
