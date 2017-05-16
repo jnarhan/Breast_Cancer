@@ -17,6 +17,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers import MaxPooling2D, ZeroPadding2D
 from keras.preprocessing.image import ImageDataGenerator
+from matplotlib import pyplot as plt
 
 # Based on emotion_model_jh_v5 from https://github.com/dwdii/emotional-faces/blob/master/src/emotion_model.py
 def bc_model_v0(outputClasses, input_shape=(3, 150, 150), verbose=False):
