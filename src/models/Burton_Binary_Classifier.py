@@ -19,22 +19,22 @@ import csv
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
 
-# Following are the three classes of images.
-classes = ['malignant', 'benign', 'normal']
-
+# Uncomment the following line for 'tumor' vs 'normal' classification.
+#classes = ['tumor', 'normal']
+classes = ['malignant', 'benign']
 trainDataBasePath = "/Users/burton/DropBox_Local/test/"
 testDataBasePath = "/Users/burton/DropBox_Local/test/"
 
 # The file below contains the training image names and their labels.
-trainDataPath = "/Users/burton/DropBox_Local/data/ddsm/build/ddsm_train.csv"
+trainDataPath = "/Users/burton/DropBox_Local/data/ddsm/build/ddsm_train_binary.csv"
 
 # The file below contains the test image names and their labels.
-testDataPath = "/Users/burton/DropBox_Local/data/ddsm/build/ddsm_test.csv"
+testDataPath = "/Users/burton/DropBox_Local/data/ddsm/build/ddsm_test_binary.csv"
 
 # Following is the base directory of the image files.
 imagePath = "/Users/burton/DropBox_Local/data/ddsm/png/"
 
-class MultiClassifier():
+class MultiClassifierBinary():
     def __init__(self, classes, trainPaths):
         self.classes = classes
         self.trainPaths = trainPaths
@@ -50,7 +50,7 @@ class MultiClassifier():
         bayes = NaiveBayesClassifier(extractors)
         knn = KNNClassifier(extractors)
         return [tree, bayes, knn]
-        # return [knn]
+        # return [bayes]
 
     def train(self):
         self.classifiers = self.getClassifiers(self.getExtractors())
@@ -66,9 +66,8 @@ class MultiClassifier():
             className = classifier.classify(img)
             print(className)
 
-
 # The following function can be run once (or as required) to copy images to folders with the named with the appropriate labels. This is required prior to running the
-# Multi-classifier model.
+# Binary-classifier model.
 def copyImages(metadataFile, mode,  exclude = ['unproven', 'pathology', 'benign_without_callback']):
     i=0;
     with open(metadataFile, 'r') as csvfile:
@@ -97,7 +96,7 @@ def main():
     # copyImages(testDataPath, "test")
     trainPaths = [trainDataBasePath + c + '/train/' for c in classes]
     testPaths = [testDataBasePath + c + '/test/' for c in classes]
-    multiClassifier = MultiClassifier(classes, trainPaths)
+    multiClassifier = MultiClassifierBinary(classes, trainPaths)
     multiClassifier.train()
     print "Result test"
     multiClassifier.test(testPaths)
