@@ -3,6 +3,9 @@
 # https://orange.biolab.si and https://github.com/biolab/orange3
 # http://simplecv.org and https://github.com/sightmachine/SimpleCV
 
+# This code was modelled after the one found at the following page:
+# http://jmgomez.me/a-fruit-image-classifier-with-python-and-simplecv/
+
 from SimpleCV.base import *
 from SimpleCV.ImageClass import Image
 from SimpleCV.Features.FeatureExtractorBase import *
@@ -34,26 +37,26 @@ testDataPath = "/Users/burton/DropBox_Local/data/ddsm/build/ddsm_test_binary.csv
 # Following is the base directory of the image files.
 imagePath = "/Users/burton/DropBox_Local/data/ddsm/png/"
 
-class MultiClassifierBinary():
+class MultiClassifier():
     def __init__(self, classes, trainPaths):
         self.classes = classes
         self.trainPaths = trainPaths
 
-    def getExtractors(self):
-        hhfe = HueHistogramFeatureExtractor(10)
-        ehfe = EdgeHistogramFeatureExtractor(10)
-        haarfe = HaarLikeFeatureExtractor(fname='/Users/burton/Downloads/SimpleCV/SimpleCV/Features/haar.txt')
-        return [hhfe, ehfe, haarfe]
+    def getFeatureExtractors(self):
+        hueHistogramFeatureExtractor = HueHistogramFeatureExtractor(10)
+        edgeHistogramFeatureExtractor = EdgeHistogramFeatureExtractor(10)
+        haarLikeFeatureExtractor = HaarLikeFeatureExtractor(fname='/Users/burton/Downloads/SimpleCV/SimpleCV/Features/haar.txt')
+        return [hueHistogramFeatureExtractor, edgeHistogramFeatureExtractor, haarLikeFeatureExtractor]
 
-    def getClassifiers(self, extractors):
+    def getModels(self, extractors):
         tree = TreeClassifier(extractors)
         bayes = NaiveBayesClassifier(extractors)
         knn = KNNClassifier(extractors)
         return [tree, bayes, knn]
-        # return [bayes]
+        # return [knn]
 
     def train(self):
-        self.classifiers = self.getClassifiers(self.getExtractors())
+        self.classifiers = self.getModels(self.getFeatureExtractors())
         for classifier in self.classifiers:
             classifier.train(self.trainPaths, self.classes, verbose=False)
 
@@ -65,6 +68,7 @@ class MultiClassifierBinary():
         for img in imgs:
             className = classifier.classify(img)
             print(className)
+
 
 # The following function can be run once (or as required) to copy images to folders with the named with the appropriate labels. This is required prior to running the
 # Binary-classifier model.
