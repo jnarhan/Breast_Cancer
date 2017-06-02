@@ -6,7 +6,7 @@ Repository for CUNY M.Sc. Data Analytics Capstone Project on Breast Cancer detec
 
 This repository contains source code, results and literature related to our research project investigating breast cancer detection and diagnosis using whole image mammograms.
 
-![Confusion Matrix Results for Pretrained CNN using Differenced Data](https://raw.githubusercontent.com/jnarhan/Breast_Cancer/master/figures/jn_Transfer_Detection_CM_20170526.png)
+![Confusion Matrix Results for Pretrained CNN using Differenced Data](https://raw.githubusercontent.com/jnarhan/Breast_Cancer/master/figures/jn_Transfer_Detection_CM_20170530.png)
 
 ## Abstract
 

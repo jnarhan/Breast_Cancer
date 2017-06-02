@@ -110,7 +110,7 @@ def get_clsCnts(y_data, cats):
 
 # Alternative to balancing by over-sampling of minority cases through synthetic augmentation
 def balanceViaSmote(cls_cnts, meta_info, data_dir, aug_dir, catagories,
-                    datagen, X_data, Y_data, seed=None, verbose=False):
+                    datagen, X_data, Y_data, imgResize = None, seed=None, verbose=False):
     aug_imgs = []
 
     if seed:
@@ -141,7 +141,7 @@ def balanceViaSmote(cls_cnts, meta_info, data_dir, aug_dir, catagories,
             aug_X = list()
             aug_Y = list()
             for i in aug_imgs:
-                img_x, img_y = load_data(i, data_dir, catagories)
+                img_x, img_y = load_data(i, data_dir, catagories, imgResize)
                 aug_X.append(img_x)
                 aug_Y.append(img_y)
 
