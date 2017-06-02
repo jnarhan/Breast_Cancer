@@ -3,7 +3,7 @@ class_name: Sequential
 config:
 - class_name: Flatten
   config:
-    batch_input_shape: !!python/tuple [null, 4, 4, 512]
+    batch_input_shape: !!python/tuple [null, 7, 7, 512]
     dtype: float32
     name: flatten_1
     trainable: true
