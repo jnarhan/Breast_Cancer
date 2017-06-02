@@ -9,11 +9,11 @@ import gc
 import csv
 import sys
 import time
+import shutil
 import itertools
 import collections
 import numpy as np
 
-from tqdm import tqdm
 from scipy import misc
 
 import keras.callbacks as cb
@@ -27,7 +27,8 @@ def pprint(msg):
     print msg
     print '-' * len(msg)
 
-# Copy of D. Dittenhafer's loading and balancing:
+# Copy of D. Dittenhafer's loading and balancing by removal.
+# Balances the data set by removing images from over-represented classes
 def load_meta(metaFile, patho_idx, file_idx, balanceByRemoval = False, verbose = False):
     bcMetaFile = {}
     bcCounts = collections.defaultdict(int)
@@ -56,7 +57,6 @@ def load_meta(metaFile, patho_idx, file_idx, balanceByRemoval = False, verbose =
     return bcMetaFile, bcCounts
 
 
-# Adapted from D. Dittenhafer, balances the data set by removing images from over-represented classes:
 def balanceViaRemoval(meta, counts, depth = 0, factor = 1.50):
     
     if(depth >= 2):
@@ -94,6 +94,77 @@ def balanceViaRemoval(meta, counts, depth = 0, factor = 1.50):
 
     balanceViaRemoval(meta, counts, depth + 1, factor)
 
+def get_clsCnts(y_data, cats):
+    ys = np.ravel(y_data)
+    labels = reverseDict(cats)
+    bcCounts = collections.defaultdict(int)
+
+    for lab in ys:
+        bcCounts[lab] += 1
+    try:
+        for key, value in labels.items():
+            bcCounts[value] = bcCounts.pop(key)
+    except KeyError:
+        pass
+    return bcCounts
+
+# Alternative to balancing by over-sampling of minority cases through synthetic augmentation
+def balanceViaSmote(cls_cnts, meta_info, data_dir, aug_dir, catagories,
+                    datagen, X_data, Y_data, seed=None, verbose=False):
+    aug_imgs = []
+
+    if seed:
+        np.random.seed(seed)
+
+    max_class_key = max(cls_cnts, key=cls_cnts.get)
+    max_class_val = cls_cnts[ max_class_key ]
+
+    for key, value in cls_cnts.items():
+        if key == max_class_key:
+            pass
+        else:
+            grow_by = max_class_val - value
+            imgs = {k:v for k, v in meta_info.items() if v == key}
+            # take a random selection of grow_by size, with replacement
+            key_indxs = np.random.choice(imgs.keys(), size=grow_by, replace=True)
+            for k1 in key_indxs:
+                aug_imgs.append({k:v for k,v in imgs.items() if k == k1})
+
+            save_dir = aug_dir + key + '/'
+
+            # Overwrite folder and contents if folder exists:
+            if os.path.exists(save_dir):
+                shutil.rmtree(save_dir)
+            os.makedirs(save_dir)
+
+            # Load randomly selected images of given catagory into memory
+            aug_X = list()
+            aug_Y = list()
+            for i in aug_imgs:
+                img_x, img_y = load_data(i, data_dir, catagories)
+                aug_X.append(img_x)
+                aug_Y.append(img_y)
+
+            # Generate augmented images
+            aug_X = np.reshape(aug_X, (len(aug_X), aug_X[0].shape[0], aug_X[0].shape[1], aug_X[0].shape[2]))
+
+            for x_batch, y_batch in datagen.flow(aug_X, aug_Y, batch_size=len(aug_X), seed=seed,
+                                                 save_to_dir= save_dir,
+                                                 save_prefix= key + '_aug',
+                                                 save_format= 'png'):
+                X_data = np.concatenate(
+                    (X_data, np.reshape(x_batch, (len(x_batch), x_batch.shape[2], x_batch.shape[3]))))
+                Y_data = np.concatenate((Y_data, np.reshape(y_batch, (len(y_batch), y_batch.shape[2]))))
+                break
+
+    if verbose:
+        bcCounts = get_clsCnts(Y_data, catagories)
+        pprint('After Balancing')
+        for k in bcCounts:
+            print '{0:10}: {1}'.format(k, bcCounts[k])
+
+    return X_data, Y_data
+
 
 def bcLabels(items):
     labels = {}
@@ -124,7 +195,7 @@ def load_data(metaData, imgPath, categories, imgSize = (255,255), imgResize = No
     Y_data = np.zeros( [total, 1], dtype=np.int8)
     
     # Load images based on meta_data:
-    for i, fn in tqdm( enumerate( metaData.keys())):
+    for i, fn in enumerate( metaData.keys()):
         filepath = os.path.join(imgPath, fn)
         if os.path.exists(filepath):
             img = misc.imread(filepath, flatten=True)
@@ -301,7 +372,6 @@ def cat_stats(matrix, TP_idx=3):
         FP = matrix[1]
         FN = matrix[2]
     elif TP_idx == 0:
-
         TN = matrix[3]
         FP = matrix[2]
         FN = matrix[1]
@@ -333,6 +403,7 @@ def cat_stats(matrix, TP_idx=3):
     return {'Sensitivity': round(Sensitivity * 100, 2), 'Specificity': round(Specificity * 100, 2),
             'PPV': round(PPV * 100, 2), 'NPV': round(NPV * 100, 2), 'F1': round(F1, 2),
             'Accuracy': round(Class_Acc * 100, 2)}
+
 
 if __name__ == '__main__':
     # Add test  cases here
