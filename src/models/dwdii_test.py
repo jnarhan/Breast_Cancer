@@ -40,10 +40,11 @@ def barChart(data, filename="barchart.png", title='Bar Chart', xLabelRotation=10
     ax.set_xticklabels(theKeys, rotation=xLabelRotation)
 
     # ax.legend((rects1[0]), ('MIAS'))
+    fig.savefig(filename, dpi=fig.dpi)
     if show:
         plt.show()
         
-    fig.savefig(filename, dpi=fig.dpi)
+    
     
     return plt
 
@@ -97,7 +98,7 @@ def main():
     #imgPath = "C:\Code\Data\DATA698-ResearchProj\ddsm-sm"
     dataFile = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\png\Ddsm_png.csv"
     imgPath = "C:\Users\Dan\Dropbox (DATA698-S17)\DATA698-S17\data\ddsm\png"
-    outDir = "C:\Code\Other\Breast_Cancer\data"
+    outDir = "..\..\data"
     valCsv = os.path.join(outDir, "ddsm_val.csv")
     testCsv = os.path.join(outDir, "ddsm_test.csv")
     trainCsv = os.path.join(outDir, "ddsm_train.csv")
@@ -126,12 +127,15 @@ def main():
 
     elif action == "splitDist":
         a, b, valData = bc.load_training_metadata(valCsv)
+        print valData
         barChart(valData, filename="../../figures/ddsm_val_dist.png", title="DDSN Validation Set Distribution")
 
         a, b, testData = bc.load_training_metadata(testCsv)
+        print testData
         barChart(testData, filename="../../figures/ddsm_test_dist.png", title="DDSN Test Set Distribution")
 
         a, b, trainData = bc.load_training_metadata(trainCsv)
+        print trainData
         barChart(trainData, filename="../../figures/ddsm_train_dist.png", title="DDSN Training Set Distribution")
 
     elif action == "mias-labels":
