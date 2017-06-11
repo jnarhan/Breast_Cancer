@@ -57,6 +57,27 @@ def load_meta(metaFile, patho_idx, file_idx, balanceByRemoval = False, verbose =
     return bcMetaFile, bcCounts
 
 
+# Minor addition to only retain meta data on images that exist
+def clean_meta(meta_data, imgPath):
+    print 'Number of entries in incoming meta_data: {}'.format(len(meta_data))
+    found = 0
+    not_found = 0
+
+    for i, fn in enumerate(meta_data.keys()):
+        filepath = os.path.join(imgPath, fn)
+        if os.path.exists(filepath):
+            found += 1
+        else:
+            del meta_data[fn]
+            not_found += 1
+
+    print 'Images found: {}'.format(found)
+    print 'Images missing: {}'.format(not_found)
+    print 'Number of entries of outgoing meta_data: {}'.format(len(meta_data))
+
+    return meta_data
+
+
 def balanceViaRemoval(meta, counts, depth = 0, factor = 1.50):
     
     if(depth >= 2):
@@ -141,7 +162,7 @@ def balanceViaSmote(cls_cnts, meta_info, data_dir, aug_dir, catagories,
             aug_X = list()
             aug_Y = list()
             for i in aug_imgs:
-                img_x, img_y = load_data(i, data_dir, catagories, imgResize)
+                img_x, img_y = load_data(i, data_dir, catagories, imgResize=imgResize)
                 aug_X.append(img_x)
                 aug_Y.append(img_y)
 
