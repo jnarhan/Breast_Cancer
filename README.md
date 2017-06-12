@@ -1,24 +1,34 @@
-# Differentiating Normal, Benign and Malignant Masses in Mammograms with Deep Learning
+# Detection and Diagnosis of Breast Cancer Using Deep Learning
 
 Repository for CUNY M.Sc. Data Analytics Capstone Project on Breast Cancer detection and diagnosis.
 
 ## Overview
 
-This repository contains source code, results and literature related to our research project investigating breast cancer detection and diagnosis using whole image mammograms.
+This repository contains source code and results related to our research project investigating breast cancer detection and diagnosis using whole image mammograms.
 
-![Confusion Matrix Results for Pretrained CNN using Differenced Data](https://raw.githubusercontent.com/jnarhan/Breast_Cancer/master/figures/jn_Transfer_Detection_CM_20170530.png)
+Detection Classification Metric | Score
+------------------------------- | ------
+Accuracy                        | 88.99%
+Sensitivity                     | 90.76%
+Specificity                     | 87.23%
+Positive Predictive Value       | 87.66%
+Negative Predictive Value       | 90.42%
+F1-Score                        | 0.89
+
+
+Diagnosis Classification Metric | Score
+------------------------------- | ------
+Accuracy                        | 78.15%
+Sensitivity                     | 75.46%
+Specificity                     | 80.86%
+Positive Predictive Value       | 79.87%
+Negative Predictive Value       | 76.61%
+F1-Score                        | 0.78
+ 
 
 ## Abstract
 
-Mammograms are arguably the gold standard in visually screening for breast cancer. 
-Motivated by the ability of convolutional neural networks to classify images in a wide spectrum of fields, 
-this study presents a pre-processing treatment and neural network architecture for automated detection and 
-classification of lesions using full mammogram images. The process leverages thresholding and image differencing 
-to improve on detection and classification performance. For detection we expose the differenced images to a 
-pre-trained neural network for feature extraction and then train a smaller network on these features for 
-classification. For pathology classification of abnormalities, we train a fully connected CNN on the raw images. 
-Given the limited mammography data we use dropout and kernel normalization to control overfitting.  Experimental 
-results on two public dataset, DDSM and MIAS achieved state-of-the-art results in detection of lesions.
+Mammograms are arguably the gold standard in visually screening for breast cancer. However  variability in human tissue and the subtlety of abnormalities can challenge lesion identification. Motivated by the ability of convolutional neural networks to classify images in a wide spectrum of fields, this study presents a pre-processing treatment and neural network architecture for the automated detection of abnormalities (such as masses or micro-calcifications) and the pathology classification of identified lesions (i.e.using diagnosis as either benign or malignant). These task are performed using full mammogram images. The process leverages thresholding, image registration and differencing to improve on detection and diagnosis performance. For both classification objectives, we expose the differenced images to a pre-trained neural network for feature extraction and then train a smaller network on these features for classification as either normal or abnormal and where abnormalities exist, as either benign or malignant. Given the limited mammography data we use a variety of regularization techniques including dropout and kernel normalization to control overfitting.  Experimental results on two public dataset, DDSM and MIAS achieved state-of-the-art results in detection of lesions.
 
 
 ## Data Sets
