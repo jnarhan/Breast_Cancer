@@ -6,25 +6,15 @@ Repository for CUNY M.Sc. Data Analytics Capstone Project on Breast Cancer detec
 
 This repository contains source code and results related to our research project investigating breast cancer detection and diagnosis using whole image mammograms.
 
-Detection Classification Metric | Score
-------------------------------- | ------
-Accuracy                        | 88.99%
-Sensitivity                     | 90.76%
-Specificity                     | 87.23%
-Positive Predictive Value       | 87.66%
-Negative Predictive Value       | 90.42%
-F1-Score                        | 0.89
+Classification Metric      | Detection Score | Diagnosis Score
+-------------------------- | --------------- | ---------------
+Accuracy                   | 88.99%          | 78.15%
+Sensitivity                | 90.76%          | 75.46%
+Specificity                | 87.23%          | 80.86%
+Positive Predictive Value  | 87.66%          | 79.87%
+Negative Predictive Value  | 90.42%          | 76.61%
+F1-Score                   | 0.89            | 0.78
 
-
-Diagnosis Classification Metric | Score
-------------------------------- | ------
-Accuracy                        | 78.15%
-Sensitivity                     | 75.46%
-Specificity                     | 80.86%
-Positive Predictive Value       | 79.87%
-Negative Predictive Value       | 76.61%
-F1-Score                        | 0.78
- 
 
 ## Abstract
 
