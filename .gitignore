@@ -92,3 +92,6 @@ ENV/
 # Rope project settings
 .ropeproject
 .Rproj.user
+
+# OS Generated
+.DS_Store
